@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AttendX - Student Attendance Management System</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-logo">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div class="brand-text">
+                    <h2>Attend<span>X</span></h2>
+                    <span class="version-tag">Pro v2.5</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="#dashboard" class="nav-item active" data-view="dashboard">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#attendance" class="nav-item" data-view="attendance">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    <span>Mark Attendance</span>
+                </a>
+                <a href="#students" class="nav-item" data-view="students">
+                    <i class="fa-solid fa-user-graduate"></i>
+                    <span>Students</span>
+                </a>
+                <a href="#classes" class="nav-item" data-view="classes">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                    <span>Classes & Subjects</span>
+                </a>
+                <a href="#reports" class="nav-item" data-view="reports">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <span>Reports & Analytics</span>
+                </a>
+                <a href="#settings" class="nav-item" data-view="settings">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>Settings & Backup</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Admin Avatar" class="user-avatar">
+                    <div class="user-info">
+                        <span class="user-name">Sarah Jenkins</span>
+                        <span class="user-role">Head Registrar</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top App Bar -->
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <button id="sidebar-toggle" class="icon-btn mobile-only">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div class="page-title-group">
+                        <h1 id="page-title">Dashboard</h1>
+                        <p id="page-subtitle">Welcome back! Here is today's attendance summary.</p>
+                    </div>
+                </div>
+
+                <div class="top-bar-right">
+                    <div class="date-badge">
+                        <i class="fa-regular fa-calendar"></i>
+                        <span id="current-date-display">Today, Oct 02, 2026</span>
+                    </div>
+                    <button id="quick-mark-btn" class="btn btn-primary">
+                        <i class="fa-solid fa-plus"></i> Mark Attendance
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dynamic View Container -->
+            <div class="content-body">
+                
+                <!-- VIEW 1: DASHBOARD -->
+                <section id="view-dashboard" class="view-section active">
+                    <!-- Metric Cards Grid -->
+                    <div class="metrics-grid">
+                        <div class="metric-card glass-card">
+                            <div class="metric-icon primary">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <div class="metric-data">
+                                <span class="metric-label">Total Students</span>
+                                <h3 id="stat-total-students">0</h3>
+                                <span class="metric-subtext positive"><i class="fa-solid fa-arrow-up"></i> 12 enrolled this term</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card glass-card">
+                            <div class="metric-icon success">
+                                <i class="fa-solid fa-user-check"></i>
+                            </div>
+                            <div class="metric-data">
+                                <span class="metric-label">Present Today</span>
+                                <h3 id="stat-present-today">0</h3>
+                                <span class="metric-subtext text-success" id="stat-present-rate">0% Rate</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card glass-card">
+                            <div class="metric-icon danger">
+                                <i class="fa-solid fa-user-xmark"></i>
+                            </div>
+                            <div class="metric-data">
+                                <span class="metric-label">Absent Today</span>
+                                <h3 id="stat-absent-today">0</h3>
+                                <span class="metric-subtext text-danger" id="stat-absent-rate">0% Rate</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card glass-card">
+                            <div class="metric-icon warning">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+                            <div class="metric-data">
+                                <span class="metric-label">Low Attendance (<75%)</span>
+                                <h3 id="stat-low-attendance">0</h3>
+                                <span class="metric-subtext text-warning">Requires Attention</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="charts-grid">
+                        <div class="chart-card glass-card span-2">
+                            <div class="card-header">
+                                <div class="header-title">
+                                    <h3>Weekly Attendance Trend</h3>
+                                    <p>Overall presence percentage for the last 7 days</p>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="trendChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card glass-card">
+                            <div class="card-header">
+                                <div class="header-title">
+                                    <h3>Today's Ratio</h3>
+                                    <p>Distribution breakdown</p>
+                                </div>
+                            </div>
+                            <div class="chart-container chart-pie-container">
+                                <canvas id="pieChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity & Defaulter Alert Table -->
+                    <div class="dashboard-tables-grid">
+                        <div class="table-card glass-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-clock-rotate-left"></i> Today's Class Submissions</h3>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Class & Section</th>
+                                            <th>Subject</th>
+                                            <th>Status</th>
+                                            <th>Present/Total</th>
+                                            <th>Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="today-classes-table">
+                                        <!-- Dynamic JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="table-card glass-card">
+                            <div class="card-header flex-between">
+                                <h3><i class="fa-solid fa-triangle-exclamation text-warning"></i> Low Attendance Alerts</h3>
+                                <button class="btn btn-sm btn-ghost" id="view-all-defaulters-btn">View All</button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Student</th>
+                                            <th>Class</th>
+                                            <th>Attendance %</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="defaulter-students-table">
+                                        <!-- Dynamic JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 2: MARK ATTENDANCE -->
+                <section id="view-attendance" class="view-section">
+                    <div class="filter-panel glass-card">
+                        <div class="filter-form">
+                            <div class="form-group">
+                                <label for="attendance-class-select"><i class="fa-solid fa-chalkboard"></i> Select Class</label>
+                                <select id="attendance-class-select" class="form-control">
+                                    <!-- Dynamic Options -->
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="attendance-date-input"><i class="fa-regular fa-calendar-days"></i> Attendance Date</label>
+                                <input type="date" id="attendance-date-input" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="attendance-session-select"><i class="fa-solid fa-book"></i> Subject / Period</label>
+                                <select id="attendance-session-select" class="form-control">
+                                    <option value="General">General Daily Attendance</option>
+                                    <option value="Mathematics">Mathematics</option>
+                                    <option value="Physics">Physics</option>
+                                    <option value="Computer Science">Computer Science</option>
+                                    <option value="English Literature">English Literature</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group align-end">
+                                <button id="load-roster-btn" class="btn btn-primary w-100">
+                                    <i class="fa-solid fa-list-check"></i> Load Student Roster
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attendance Register Sheet -->
+                    <div class="attendance-sheet-card glass-card">
+                        <div class="sheet-toolbar">
+                            <div class="sheet-info">
+                                <h3 id="current-sheet-title">Class Roster</h3>
+                                <span id="sheet-student-count" class="badge badge-info">0 Students</span>
+                            </div>
+
+                            <div class="bulk-actions">
+                                <button id="btn-mark-all-present" class="btn btn-sm btn-outline-success">
+                                    <i class="fa-solid fa-check-double"></i> Mark All Present
+                                </button>
+                                <button id="btn-mark-all-absent" class="btn btn-sm btn-outline-danger">
+                                    <i class="fa-solid fa-xmark"></i> Mark All Absent
+                                </button>
+                                <button id="btn-save-attendance" class="btn btn-primary btn-glow">
+                                    <i class="fa-solid fa-floppy-disk"></i> Save Attendance Record
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="data-table attendance-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 70px;">Roll No</th>
+                                        <th>Student Name</th>
+                                        <th>Overall %</th>
+                                        <th style="text-align: center;">Mark Attendance Status</th>
+                                        <th>Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attendance-roster-tbody">
+                                    <!-- Dynamic Roster Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 3: STUDENTS DIRECTORY -->
+                <section id="view-students" class="view-section">
+                    <div class="toolbar-panel glass-card">
+                        <div class="toolbar-left">
+                            <div class="search-box">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" id="student-search-input" placeholder="Search by name, roll no, or ID...">
+                            </div>
+
+                            <select id="student-class-filter" class="form-control width-auto">
+                                <option value="ALL">All Classes</option>
+                                <!-- JS Populated -->
+                            </select>
+
+                            <select id="student-status-filter" class="form-control width-auto">
+                                <option value="ALL">All Attendance Levels</option>
+                                <option value="GOOD">Good (≥ 85%)</option>
+                                <option value="AVERAGE">Average (75% - 84%)</option>
+                                <option value="LOW">Low / Warning (< 75%)</option>
+                            </select>
+                        </div>
+
+                        <div class="toolbar-right">
+                            <button id="add-student-modal-btn" class="btn btn-primary">
+                                <i class="fa-solid fa-user-plus"></i> Add New Student
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="students-grid" id="students-cards-container">
+                        <!-- Student Profile Cards injected here -->
+                    </div>
+                </section>
+
+                <!-- VIEW 4: CLASSES & SUBJECTS -->
+                <section id="view-classes" class="view-section">
+                    <div class="toolbar-panel glass-card">
+                        <div class="toolbar-left">
+                            <h3>Active School Classes</h3>
+                        </div>
+                        <div class="toolbar-right">
+                            <button id="add-class-btn" class="btn btn-primary">
+                                <i class="fa-solid fa-plus"></i> Create Class Section
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="classes-grid" id="classes-cards-container">
+                        <!-- Class Cards Injected by JS -->
+                    </div>
+                </section>
+
+                <!-- VIEW 5: REPORTS & ANALYTICS -->
+                <section id="view-reports" class="view-section">
+                    <div class="filter-panel glass-card">
+                        <div class="filter-form">
+                            <div class="form-group">
+                                <label><i class="fa-solid fa-filter"></i> Report Type</label>
+                                <select id="report-type-select" class="form-control">
+                                    <option value="class-summary">Class Attendance Summary Report</option>
+                                    <option value="defaulters">Low Attendance Defaulters List (< 75%)</option>
+                                    <option value="date-range">Date Range Detailed Log</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label><i class="fa-solid fa-chalkboard-user"></i> Target Class</label>
+                                <select id="report-class-select" class="form-control">
+                                    <option value="ALL">All Classes Combined</option>
+                                    <!-- Populated by JS -->
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label><i class="fa-solid fa-calendar"></i> From Date</label>
+                                <input type="date" id="report-start-date" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label><i class="fa-solid fa-calendar"></i> To Date</label>
+                                <input type="date" id="report-end-date" class="form-control">
+                            </div>
+                        </div>
+                        <div class="filter-actions mt-3">
+                            <button id="generate-report-btn" class="btn btn-primary">
+                                <i class="fa-solid fa-rotate"></i> Generate Report
+                            </button>
+                            <button id="export-csv-btn" class="btn btn-outline-success">
+                                <i class="fa-solid fa-file-csv"></i> Export to CSV
+                            </button>
+                            <button id="print-report-btn" class="btn btn-outline-light">
+                                <i class="fa-solid fa-print"></i> Print / Download PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="report-results-card glass-card printable-area">
+                        <div class="report-header">
+                            <div class="report-title">
+                                <h2 id="report-heading">Class Attendance Summary Report</h2>
+                                <p id="report-subheading">Generated on October 2, 2026</p>
+                            </div>
+                            <div class="report-stamp">
+                                <span class="badge badge-success">Official Audit Report</span>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="data-table" id="report-table">
+                                <thead>
+                                    <tr id="report-table-head">
+                                        <!-- Dynamic JS -->
+                                    </tr>
+                                </thead>
+                                <tbody id="report-table-body">
+                                    <!-- Dynamic JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 6: SETTINGS & BACKUP -->
+                <section id="view-settings" class="view-section">
+                    <div class="settings-grid">
+                        <div class="settings-card glass-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-database"></i> Data Backup & Restore</h3>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-4">Export all student roster, class definitions, and historical attendance logs into a JSON file, or restore from a backup file.</p>
+                                
+                                <div class="btn-group">
+                                    <button id="btn-export-backup" class="btn btn-primary">
+                                        <i class="fa-solid fa-download"></i> Download Full Backup (.json)
+                                    </button>
+                                    <label class="btn btn-outline-light cursor-pointer">
+                                        <i class="fa-solid fa-upload"></i> Restore from JSON
+                                        <input type="file" id="import-file-input" accept=".json" style="display: none;">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-card glass-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-rotate-left text-danger"></i> Reset System Data</h3>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-4">Restore sample demo data (overwriting current changes) to start fresh with realistic mock students and attendance records.</p>
+                                <button id="btn-reset-data" class="btn btn-danger">
+                                    <i class="fa-solid fa-trash-arrow-up"></i> Reset to Sample Data
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="settings-card glass-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-sliders"></i> Attendance Policy Thresholds</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label>Low Attendance Defaulter Threshold (%)</label>
+                                    <input type="number" id="setting-threshold" class="form-control" value="75" min="50" max="95">
+                                    <span class="text-sm text-muted">Students under this percentage trigger low-attendance warning badges.</span>
+                                </div>
+                                <button id="btn-save-settings" class="btn btn-primary mt-3">Save Policy</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL 1: ADD / EDIT STUDENT -->
+    <div id="student-modal" class="modal-overlay">
+        <div class="modal-card glass-card">
+            <div class="modal-header">
+                <h3 id="student-modal-title">Add New Student</h3>
+                <button class="modal-close-btn" data-close-modal="student-modal">&times;</button>
+            </div>
+            <form id="student-form">
+                <input type="hidden" id="student-form-id">
+                <div class="modal-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Full Name *</label>
+                            <input type="text" id="student-name-input" class="form-control" placeholder="e.g. Alex Rivera" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Roll Number / ID *</label>
+                            <input type="text" id="student-roll-input" class="form-control" placeholder="e.g. 101" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Class & Section *</label>
+                            <select id="student-class-select-input" class="form-control" required>
+                                <!-- JS Options -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <select id="student-gender-input" class="form-control">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Guardian / Parent Email</label>
+                            <input type="email" id="student-email-input" class="form-control" placeholder="parent@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Contact Phone</label>
+                            <input type="tel" id="student-phone-input" class="form-control" placeholder="+1 (555) 019-2834">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-light" data-close-modal="student-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: STUDENT ATTENDANCE HISTORY PROFILE -->
+    <div id="student-history-modal" class="modal-overlay">
+        <div class="modal-card glass-card modal-lg">
+            <div class="modal-header">
+                <div class="profile-header-info">
+                    <img id="modal-student-avatar" src="" alt="Avatar" class="avatar-lg">
+                    <div>
+                        <h3 id="modal-student-name">Student Name</h3>
+                        <p id="modal-student-meta" class="text-muted">Roll #00 | Grade 10-A</p>
+                    </div>
+                </div>
+                <button class="modal-close-btn" data-close-modal="student-history-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="profile-stats-bar mb-4">
+                    <div class="p-stat">
+                        <span class="p-stat-value text-success" id="modal-stat-present">0</span>
+                        <span class="p-stat-label">Days Present</span>
+                    </div>
+                    <div class="p-stat">
+                        <span class="p-stat-value text-danger" id="modal-stat-absent">0</span>
+                        <span class="p-stat-label">Days Absent</span>
+                    </div>
+                    <div class="p-stat">
+                        <span class="p-stat-value text-warning" id="modal-stat-late">0</span>
+                        <span class="p-stat-label">Days Late</span>
+                    </div>
+                    <div class="p-stat">
+                        <span class="p-stat-value text-primary" id="modal-stat-percentage">0%</span>
+                        <span class="p-stat-label">Attendance Rate</span>
+                    </div>
+                </div>
+
+                <h4>Detailed Attendance Log</h4>
+                <div class="table-responsive max-h-300">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Subject/Session</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modal-student-history-tbody">
+                            <!-- JS dynamic rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: CREATE CLASS SECTION -->
+    <div id="class-modal" class="modal-overlay">
+        <div class="modal-card glass-card">
+            <div class="modal-header">
+                <h3>Add New Class Section</h3>
+                <button class="modal-close-btn" data-close-modal="class-modal">&times;</button>
+            </div>
+            <form id="class-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Class Name & Code *</label>
+                        <input type="text" id="class-name-input" class="form-control" placeholder="e.g. Grade 11 - Computer Science" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Class Teacher / Instructor</label>
+                        <input type="text" id="class-teacher-input" class="form-control" placeholder="e.g. Prof. Alan Turing" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Room Number</label>
+                        <input type="text" id="class-room-input" class="form-control" placeholder="e.g. Lab 302">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-light" data-close-modal="class-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Class</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/store.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
